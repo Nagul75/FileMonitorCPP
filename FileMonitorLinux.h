@@ -23,7 +23,7 @@ public:
 
     [[nodiscard]] std::vector<std::string>& getPaths() {return m_paths;}
 private:
-    void monitorLoop() const;
+    void monitorLoop();
     static constexpr int EVENT_BUFF_LENGTH{1024 * (sizeof(struct inotify_event)+ 16)};
     std::vector<std::string> m_paths{};
     int m_fileDescriptor{};
