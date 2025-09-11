@@ -9,7 +9,7 @@
 
 class IFileMonitor
 {
-protected:
+public:
     virtual ~IFileMonitor() = default;
     virtual bool addWatch(const std::string& path) = 0;
     virtual bool removeWatch(const std::string& path) = 0;
