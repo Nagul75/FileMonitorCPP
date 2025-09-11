@@ -43,7 +43,7 @@ bool FileMonitorLinux::removeWatch(const std::string& path)
     return true;
 }
 
-void FileMonitorLinux::monitorLoop() const
+void FileMonitorLinux::monitorLoop()
 {
     std::unordered_map<int, std::string> watches{};
 
@@ -88,9 +88,6 @@ void FileMonitorLinux::monitorLoop() const
         if (pfd.revents & POLLIN)
         {
             char buffer[EVENT_BUFF_LENGTH];
-
-            while (!watches.empty())
-            {
                 const std::ptrdiff_t length{read(m_fileDescriptor, buffer, EVENT_BUFF_LENGTH)};
                 if (length < 0)
                 {
@@ -127,7 +124,7 @@ void FileMonitorLinux::monitorLoop() const
                     }
                     i += sizeof(struct inotify_event) + event->len;
                 }
-            }
+
         }
     }
     for (const auto& watch : watches) {
