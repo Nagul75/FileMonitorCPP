@@ -23,7 +23,6 @@ bool FileMonitorLinux::addWatch(const std::string& path)
     const auto it{std::ranges::find(m_paths, path)};
     if (it != m_paths.end())
     {
-        std::cout << "Path already present in monitor. \n";
         return false;
     }
     m_paths.emplace_back(path);
@@ -36,7 +35,6 @@ bool FileMonitorLinux::removeWatch(const std::string& path)
     const auto it{std::ranges::find(m_paths, path)};
     if (it == m_paths.end())
     {
-        std::cout << "Path not present in monitor. \n";
         return false;
     }
     m_paths.erase(it);
@@ -57,7 +55,7 @@ void FileMonitorLinux::monitorLoop()
             errorMsg += path;
 
             // remove existing watches
-            std::cout << "Removing existing watches and exiting ... \n";
+            std::cerr << "Removing existing watches and exiting ... \n";
             for (const auto& watch: watches)
             {
                 inotify_rm_watch(m_fileDescriptor, watch.first);
@@ -67,7 +65,7 @@ void FileMonitorLinux::monitorLoop()
         }
 
         watches.insert({current_wd, path});
-        std::cout << "Watching path: " << path << '\n';
+        std::cerr << "Watching path: " << path << '\n';
     }
 
     struct pollfd pfd{};
@@ -76,15 +74,10 @@ void FileMonitorLinux::monitorLoop()
 
     while (!m_stopRequested && !watches.empty())
     {
-        int ret{poll(&pfd, 1, 250)};
-        if (ret < 0)
-        {
-            break;
-        }
-        if (ret == 0)
-        {
-            continue;
-        }
+        const int ret{poll(&pfd, 1, 250)};
+        if (ret < 0) break;
+        if (ret == 0) continue;
+
         if (pfd.revents & POLLIN)
         {
             char buffer[EVENT_BUFF_LENGTH];
@@ -102,7 +95,7 @@ void FileMonitorLinux::monitorLoop()
                         const auto it {watches.find(event->wd)};
                         if (it != watches.end())
                         {
-                            std::cout << "EVENT: Watched directory '" << it->second << "' was deleted." << '\n';
+                            std::cerr << "EVENT: Watched directory '" << it->second << "' was deleted." << '\n';
                             watches.erase(it);
                         }
                     }
@@ -115,11 +108,11 @@ void FileMonitorLinux::monitorLoop()
                             continue;
                         }
                         if (event->mask & IN_CREATE) {
-                            std::cout << "EVENT: File '" << event->name << "' was created." << '\n';
+                            std::cerr << "EVENT: File '" << event->name << "' was created." << '\n';
                         } else if (event->mask & IN_CLOSE_WRITE) {
-                            std::cout << "EVENT: File '" << event->name << "' was modified." << '\n';
+                            std::cerr << "EVENT: File '" << event->name << "' was modified." << '\n';
                         } else if (event->mask & IN_DELETE) {
-                            std::cout << "EVENT: File '" << event->name << "' was deleted." << '\n';
+                            std::cerr << "EVENT: File '" << event->name << "' was deleted." << '\n';
                         }
                     }
                     i += sizeof(struct inotify_event) + event->len;
@@ -139,6 +132,9 @@ void FileMonitorLinux::start()
         return;
     }
     m_stopRequested = false;
+
+    std::cerr << "Starting file monitor \n";
+    m_running = true;
     // Launch monitorLoop() on a new thread
     m_monitorThread = std::thread(&FileMonitorLinux::monitorLoop, this);
 }
@@ -147,7 +143,8 @@ void FileMonitorLinux::stop()
 {
     if (m_monitorThread.joinable()) {
         m_stopRequested = true; // Signal the thread to stop
+        m_running = false;
         m_monitorThread.join(); // Wait for the thread to finish
     }
+    std::cerr << "Stopping file monitor \n";
 }
-

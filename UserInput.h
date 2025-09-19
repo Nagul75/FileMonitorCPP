@@ -11,6 +11,7 @@
 namespace UserInput
 {
     std::vector<std::string> getPaths();
+    int getChoice();
 }
 
 #endif //FILEMONITOR_USERINPUT_H

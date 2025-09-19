@@ -9,4 +9,6 @@ add_executable(FileMonitor
         FileMonitorLinux.cpp
         FileMonitorLinux.h
         Factory.cpp
+        UserInput.h
+        UserInput.cpp
 )

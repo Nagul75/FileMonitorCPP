@@ -4,6 +4,7 @@
 
 #include "UserInput.h"
 #include <iostream>
+#include <limits>
 #include <sstream>
 
 std::vector<std::string> splitPathsBySpace(const std::string& paths)
@@ -28,5 +29,25 @@ std::vector<std::string> UserInput::getPaths()
         std::getline(std::cin >> std::ws, paths);
         if (paths.empty()) continue;
         return splitPathsBySpace(paths);
+    }
+}
+
+int UserInput::getChoice()
+{
+    int choice{};
+    while (true)
+    {
+        std::cout << "Enter command (1, 2, 3, 4): ";
+        std::cin >> choice;
+
+        if (!std::cin)
+        {
+            if (std::cin.eof()) std::exit(0);
+            std::cout << "Invalid input! \n";
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        if (choice > 0 && choice < 5)
+            return choice;
     }
 }

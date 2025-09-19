@@ -21,6 +21,7 @@ public:
     void stop() override;
     ~FileMonitorLinux() override;
 
+    [[nodiscard]] bool getRunning() const{return m_running;}
     [[nodiscard]] std::vector<std::string>& getPaths() {return m_paths;}
 private:
     void monitorLoop();
@@ -30,6 +31,7 @@ private:
 
     std::thread m_monitorThread;
     std::atomic<bool> m_stopRequested{false};
+    bool m_running{false};
 };
 
 #endif //FILEMONITOR_FILEMONITORLINUX_H
