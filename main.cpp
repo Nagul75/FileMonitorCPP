@@ -9,6 +9,7 @@
 
 void printMenu()
 {
+    std::cout << "\n \n";
     std::cout << "1. Add Path \n";
     std::cout << "2. Remove Path \n";
     std::cout << "3. Start File Monitor \n";
@@ -65,6 +66,7 @@ void handleChoice(const int choice, std::unique_ptr<IFileMonitor>& fm)
 int main()
 {
     std::cout << "CPP File Monitor using Inotify \n";
+    std::cout << "NOTE: File monitor will be stopped when paths are added/removed! Be sure to start it again. \n";
     std::unique_ptr<IFileMonitor> fm{createFileMonitor()};
     while (true)
     {
@@ -77,6 +79,6 @@ int main()
         }
         handleChoice(choice, fm);
     }
-    std::cout << "Thank you for using Regal's CPP FileMonitor \n";
+    std::cout << "Thank you for using Team Nagul's CPP FileMonitor \n";
     return 0;
 }
